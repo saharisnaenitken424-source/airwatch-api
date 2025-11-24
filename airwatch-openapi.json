@@ -1,0 +1,191 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AirWatch Indonesia API",
+    "description": "API untuk monitoring dan update kualitas udara (PPM) di berbagai daerah Indonesia.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.airwatch.id"
+    }
+  ],
+  "paths": {
+    "/regions": {
+      "get": {
+        "summary": "Get all regions air quality",
+        "description": "Mengambil semua data daerah beserta nilai PPM dan trend.",
+        "responses": {
+          "200": {
+            "description": "Daftar semua daerah",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Region"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/{id}": {
+      "get": {
+        "summary": "Get region detail",
+        "description": "Mengambil detail kualitas udara dari daerah berdasarkan ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data daerah ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Region"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Region not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update PPM manually",
+        "description": "Memperbarui nilai PPM daerah secara manual.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ppm": {
+                    "type": "integer",
+                    "example": 120
+                  }
+                },
+                "required": [
+                  "ppm"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PPM updated successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Region not found"
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "Get overall statistics",
+        "description": "Mengambil statistik nasional termasuk rata-rata PPM, jumlah daerah sehat, dan jumlah daerah bahaya.",
+        "responses": {
+          "200": {
+            "description": "Statistik nasional",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/simulate": {
+      "post": {
+        "summary": "Trigger auto-update simulation",
+        "description": "Mensimulasikan perubahan PPM acak seperti di React (opsional).",
+        "responses": {
+          "200": {
+            "description": "Simulation updated regions"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Region": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Jakarta Pusat"
+          },
+          "ppm": {
+            "type": "integer",
+            "example": 185
+          },
+          "trend": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "stable"
+            ],
+            "example": "up"
+          }
+        }
+      },
+      "Stats": {
+        "type": "object",
+        "properties": {
+          "averagePPM": {
+            "type": "integer",
+            "example": 98
+          },
+          "dangerousCount": {
+            "type": "integer",
+            "example": 2
+          },
+          "healthyCount": {
+            "type": "integer",
+            "example": 3
+          },
+          "totalRegions": {
+            "type": "integer",
+            "example": 8
+          }
+        }
+      }
+    }
+  }
+}
